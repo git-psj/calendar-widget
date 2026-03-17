@@ -58,14 +58,12 @@
       min-height: 0;
     }
     .day {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
       position: relative;
       overflow: visible;
     }
     .day.empty { visibility: hidden; }
+
+    /* day-num: 셀 상단 중앙 고정 */
     .day-num {
       font-size: 5.3vh;
       color: #1a1a1a;
@@ -85,21 +83,30 @@
     .day.has-schedule .day-num { background: #FAEEDA; color: #854F0B; font-weight: 500; }
     .day.today.has-schedule .day-num { background: #85B7EB; color: #042C53; }
 
-    /* 선: day-num top(8%) + height(7.8vh) - 선두께(0.5vh) */
-    .span-bar { height: 0.5vh; position: absolute; top: calc(5% + 7.8vh); z-index: 2; background: #EF9F27; }
-    .day.span-start .span-bar { left: calc(50% - 3.9vh); right: 0; border-radius: 99px 0 0 99px; }
-    .day.span-mid .span-bar { left: 0; right: 0; border-radius: 0; }
-    .day.span-end .span-bar { left: 0; right: calc(50% - 3.9vh); border-radius: 0 99px 99px 0; }
+    /* span-line: day-num의 bottom과 같은 위치 = top 5% + height 7.8vh - 선두께 0.5vh */
+    /* start: 박스 왼쪽~오른쪽 끝, mid: 셀 전체, end: 왼쪽 끝~박스 오른쪽 */
+    .span-line {
+      height: 0.5vh;
+      position: absolute;
+      bottom: calc(95% - 7.8vh);  /* = 100% - (5% + 7.8vh) */
+      z-index: 2;
+      background: #97C459;
+    }
+    .day.span-start .span-line { left: calc(50% - 3.9vh); right: 0; border-radius: 99px 0 0 99px; }
+    .day.span-mid .span-line { left: 0; right: 0; border-radius: 0; }
+    .day.span-end .span-line { left: 0; right: calc(50% - 3.9vh); border-radius: 0 99px 99px 0; }
 
+    /* other-count: 박스 바로 아래 */
     .other-count {
       font-size: 3.3vh;
       color: #aaa;
       line-height: 1.1;
       position: absolute;
-      top: calc(5% + 7.8vh + 0.6vh);
+      top: calc(5% + 7.8vh + 0.7vh);
       left: 50%;
       transform: translateX(-50%);
       z-index: 1;
+      white-space: nowrap;
     }
 
     .popup {
@@ -143,7 +150,7 @@
       .day.has-schedule .day-num { background: #633806; color: #FAC775; }
       .day.today .day-num { background: #185FA5; color: #E6F1FB; }
       .day.today.has-schedule .day-num { background: #185FA5; color: #E6F1FB; }
-      .span-bar { background: #BA7517; }
+      .span-line { background: #639922; }
       .other-count { color: #555; }
       .popup { background: #2a2a2a; border-color: #444; }
       .popup-item.schedule { background: #633806; color: #FAC775; }
@@ -259,9 +266,9 @@
         el.appendChild(numEl);
 
         if (data.span && data.span !== 'single') {
-          const bar = document.createElement('div');
-          bar.className = 'span-bar';
-          el.appendChild(bar);
+          const line = document.createElement('div');
+          line.className = 'span-line';
+          el.appendChild(line);
         }
         if (otherCount > 0) {
           const s = document.createElement('div');
