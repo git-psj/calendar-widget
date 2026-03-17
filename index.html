@@ -76,7 +76,9 @@
       justify-content: center;
       border-radius: 0.8vh;
       position: absolute;
-      top: 8%;
+      top: 5%;
+      left: 50%;
+      transform: translateX(-50%);
       z-index: 1;
     }
     .day.today .day-num { background: #85B7EB; color: #042C53; font-weight: 500; border-radius: 50%; }
@@ -84,7 +86,7 @@
     .day.today.has-schedule .day-num { background: #85B7EB; color: #042C53; }
 
     /* 선: day-num top(8%) + height(7.8vh) - 선두께(0.5vh) */
-    .span-bar { height: 0.5vh; position: absolute; top: calc(8% + 7.8vh - 0.5vh); z-index: 2; background: #EF9F27; }
+    .span-bar { height: 0.5vh; position: absolute; top: calc(5% + 7.8vh); z-index: 2; background: #EF9F27; }
     .day.span-start .span-bar { left: calc(50% - 3.9vh); right: 0; border-radius: 99px 0 0 99px; }
     .day.span-mid .span-bar { left: 0; right: 0; border-radius: 0; }
     .day.span-end .span-bar { left: 0; right: calc(50% - 3.9vh); border-radius: 0 99px 99px 0; }
@@ -94,7 +96,9 @@
       color: #aaa;
       line-height: 1.1;
       position: absolute;
-      top: calc(8% + 7.8vh + 2px);
+      top: calc(5% + 7.8vh + 0.6vh);
+      left: 50%;
+      transform: translateX(-50%);
       z-index: 1;
     }
 
