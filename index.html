@@ -150,7 +150,7 @@
       const rest = events.length - 3;
       shown.forEach(ev => {
         const item = document.createElement('div');
-        item.className = 'popup-item ' + (ev.category === '공부' ? 'study' : 'schedule');
+        item.className = 'popup-item ' + (ev.category !== '일정' ? 'study' : 'schedule');
         item.textContent = ev.title;
         popup.appendChild(item);
       });
@@ -180,7 +180,7 @@
       for (let d = 1; d <= lastDate; d++) {
         const date = new Date(y, m, d);
         const data = dayMap[d] || { span: null, events: [] };
-        const studyCount = data.events.filter(e => e.category === '공부').length;
+        const studyCount = data.events.filter(e => e.category !== '일정').length;
         const hasSchedule = data.events.some(e => e.category === '일정');
 
         const el = document.createElement('div');
