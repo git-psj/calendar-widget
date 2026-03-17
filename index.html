@@ -38,7 +38,7 @@
     .day.span-start .span-bar { left: calc(50% - 13px); right: 0; border-radius: 99px 0 0 99px; }
     .day.span-mid .span-bar { left: 0; right: 0; border-radius: 0; }
     .day.span-end .span-bar { left: 0; right: calc(50% - 13px); border-radius: 0 99px 99px 0; }
-    .study-count { font-size: 9px; color: #aaa; line-height: 1.1; margin-top: 1px; position: relative; z-index: 1; }
+    .other-count { font-size: 9px; color: #aaa; line-height: 1.1; margin-top: 1px; position: relative; z-index: 1; }
 
     /* 팝업 */
     .popup {
@@ -69,10 +69,9 @@
     }
     .popup-item:last-child { margin-bottom: 0; }
     .popup-item.schedule { background: #FAEEDA; color: #854F0B; }
-    .popup-item.study { background: #E6F1FB; color: #185FA5; }
+    .popup-item.other { background: #E6F1FB; color: #185FA5; }
     .popup-item.more { background: none; color: #aaa; font-size: 10px; padding: 2px 6px; }
 
-    /* 다크모드 */
     @media (prefers-color-scheme: dark) {
       .cal { background: #1f1f1f; border-color: #333; }
       .month-label { color: #e0e0e0; }
@@ -84,10 +83,10 @@
       .day.today .day-num { background: #185FA5; color: #E6F1FB; }
       .day.today.has-schedule .day-num { background: #185FA5; color: #E6F1FB; }
       .span-bar { background: #BA7517; }
-      .study-count { color: #555; }
+      .other-count { color: #555; }
       .popup { background: #2a2a2a; border-color: #444; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
       .popup-item.schedule { background: #633806; color: #FAC775; }
-      .popup-item.study { background: #0C447C; color: #B5D4F4; }
+      .popup-item.other { background: #0C447C; color: #B5D4F4; }
       .popup-item.more { color: #666; }
     }
   </style>
@@ -107,8 +106,11 @@
   </div>
 
   <script>
-    // ⚠️ 배포한 Cloudflare Workers URL 입력
-    const WORKER_URL = "https://calendar-widget.notionwjsdyd.workers.dev";
+    // ⚠️ 설정값 — 필요에 따라 변경하세요
+    const CONFIG = {
+      WORKER_URL: "https://calendar-widget.notionwjsdyd.workers.dev", // Cloudflare Workers URL
+      SCHEDULE_CATEGORY: "일정",  // 이 값이면 노란색, 그 외는 하늘색
+    };
 
     const today = new Date();
     let cur = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -130,7 +132,7 @@
             const k = d.getDate();
             if (!map[k]) map[k] = { span: null, events: [] };
             map[k].events.push({ title: ev.title, category: ev.category });
-            if (ev.category === '일정') {
+            if (ev.category === CONFIG.SCHEDULE_CATEGORY) {
               if (!isMulti) map[k].span = 'single';
               else if (isSameDay(d, start)) map[k].span = 'start';
               else if (isSameDay(d, end)) map[k].span = 'end';
@@ -150,7 +152,7 @@
       const rest = events.length - 3;
       shown.forEach(ev => {
         const item = document.createElement('div');
-        item.className = 'popup-item ' + (ev.category !== '일정' ? 'study' : 'schedule');
+        item.className = 'popup-item ' + (ev.category === CONFIG.SCHEDULE_CATEGORY ? 'schedule' : 'other');
         item.textContent = ev.title;
         popup.appendChild(item);
       });
@@ -177,11 +179,12 @@
         el.className = 'day empty';
         grid.appendChild(el);
       }
+
       for (let d = 1; d <= lastDate; d++) {
         const date = new Date(y, m, d);
         const data = dayMap[d] || { span: null, events: [] };
-        const studyCount = data.events.filter(e => e.category !== '일정').length;
-        const hasSchedule = data.events.some(e => e.category === '일정');
+        const otherCount = data.events.filter(e => e.category !== CONFIG.SCHEDULE_CATEGORY).length;
+        const hasSchedule = data.events.some(e => e.category === CONFIG.SCHEDULE_CATEGORY);
 
         const el = document.createElement('div');
         let cls = 'day';
@@ -199,10 +202,10 @@
           bar.className = 'span-bar';
           el.appendChild(bar);
         }
-        if (studyCount > 0) {
+        if (otherCount > 0) {
           const s = document.createElement('div');
-          s.className = 'study-count';
-          s.textContent = '+' + studyCount;
+          s.className = 'other-count';
+          s.textContent = '+' + otherCount;
           el.appendChild(s);
         }
         if (data.events.length > 0) {
@@ -214,7 +217,7 @@
 
     async function loadEvents() {
       try {
-        const res = await fetch(WORKER_URL + '/events');
+        const res = await fetch(CONFIG.WORKER_URL + '/events');
         if (!res.ok) throw new Error('fetch 실패');
         eventList = await res.json();
         render();
